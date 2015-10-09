@@ -28,24 +28,6 @@ public class SportsMatchAciton {
 	private SportsMatchService sportsMatchService;
 	
 	
-	public JsonData getSportsList(String nearBy,HttpServletRequest request) {
-		//当前页
-		String cp = request.getParameter("currentpage");
-		int currentPage = 1;
-		if(cp !=  null){
-			currentPage = Integer.valueOf(cp);
-		}
-		Map<String,Object> params = new HashMap<String, Object>();
-		if(nearBy!=null && !"".equals(nearBy)) {
-			params.put("nearBy", nearBy);
-		}
-		int totalCount = placeService.listPlacesCount(params);
-		List<Place> recordList = placeService.listPlaces(params,currentPage,Conv.pageSize);
-	}
-	
-	
-	
-	
 	/**
 	 * 用户发布活动
 	 * @param sportsMatch
