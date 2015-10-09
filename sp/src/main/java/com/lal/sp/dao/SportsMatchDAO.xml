@@ -8,12 +8,81 @@
 		MapperRegistry”
 	-->
 	
+	<resultMap type="SportsMatch" id="sportsMap">
+		<id property="id" column="id"/>
+		<result property="name" column="sp_name"/>
+		<result property="picture" column="sp_picture"/>
+		<result property="content" column="sp_content"/>
+		<result property="startTime" column="sp_start_time"/>
+		<result property="endTime" column="sp_end_time"/>
+		<result property="joinEndTime" column="sp_join_end_time"/>
+		<result property="persons" column="sp_persons"/>
+		<result property="cost" column="sp_cost"/>
+		<result property="address" column="sp_address"/>
+		<result property="province" column="province"/>
+		<result property="city" column="city"/>
+		<result property="district" column="district"/>
+		<result property="longitude" column="longitude"/>
+		<result property="latitude" column="latitude"/>
+		<result property="status" column="status"/>
+		<result property="remark" column="remark"/>
+		<association property="publisher" javaType="User">
+			<id property="id" column="userId"/>
+			<result property="name" column="userName"/>
+			<result property="phone" column="userPhone"/>
+		</association>
+	</resultMap>
+	
+	
+	<resultMap type="SportsMatch" id="sportsMatchMap">
+		<id property="id" column="id"/>
+		<result property="name" column="sm_name"/>
+		<result property="picture" column="sm_picture"/>
+		<result property="content" column="sm_content"/>
+		<result property="startTime" column="sm_start_time"/>
+		<result property="endTime" column="sm_end_time"/>
+		<result property="joinEndTime" column="sm_join_end_time"/>
+		<result property="persons" column="sm_persons"/>
+		<result property="cost" column="sm_cost"/>
+		<result property="address" column="sm_address"/>
+		<result property="province" column="province"/>
+		<result property="city" column="city"/>
+		<result property="district" column="district"/>
+		<result property="longitude" column="longitude"/>
+		<result property="latitude" column="latitude"/>
+		<result property="status" column="status"/>
+		<result property="remark" column="remark"/>
+		<result property="type" column="sm_type"/>
+		<association property="publisher" javaType="Organization">
+			<id property="id" column="oId"/>
+			<result property="name" column="oName"/>
+			<result property="phone" column="oPhone"/>
+		</association>
+		<association property="site" javaType="Place">
+			<id/>
+		</association>
+		<association property="insurance" javaType="Insurance">
+			<id/>
+		</association>
+	</resultMap>
+	
 	<insert id="publishSports" parameterType="SportsMatch">
-		insert into sp_sports_match(sm_name,sm_picture,sm_content,sm_start_time,sm_end_time,sm_join_end_time,sm_persons,sm_cost,sp_address,sp_publisher,province,city,district,longitude,latitude,status,remark)
+		insert into sp_sports(sp_name,sp_picture,sp_content,sp_start_time,sp_end_time,sp_join_end_time,sp_persons,sp_cost,sp_address,sp_publisher,province,city,district,longitude,latitude,status,remark)
 		values(#{name},#{picture},#{content},#{content},#{startTime},#{endTime},#{joinEndTime},#{persons},#{cost},#{address},#{publisher.id},#{province},#{city},#{district},#{longitude},#{latitude},#{status},#{remark})
 	</insert>
 	
 	<insert id="applySports" parameterType="UserSportsApply">
 		insert into sp_sprots_users (sp_sports_id,sp_user_id,user_phone,user_name,status,remark) values(#{sportsMatch.id},#{user.id},#{phone},#{name},#{status},#{remark})
 	</insert>
+	
+	<select id="listAllSportsCount" parameterType="map">
+		select count(*) from sp_sports where status=#{status}
+	</select>
+	
+	<select id="listAllSports" resultMap="sportsMap" parameterType="map">
+		select sp.*,su.id as userId,su.us_name as userName,su.us_phone as userPhone from sp_sports sp left join sp_user su on sp.sp_publisher=su.id where 1=1
+		<if test="status!=null">
+			and status=#{status}
+		</if>
+	</select>
 </mapper>

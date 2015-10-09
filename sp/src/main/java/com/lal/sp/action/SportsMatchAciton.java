@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.lal.sp.bean.JsonData;
+import com.lal.sp.bean.PageBean;
 import com.lal.sp.bean.Place;
 import com.lal.sp.bean.SportsMatch;
 import com.lal.sp.bean.UserSportsApply;
@@ -26,6 +27,32 @@ public class SportsMatchAciton {
 	
 	@Autowired
 	private SportsMatchService sportsMatchService;
+	
+	
+	@RequestMapping("/getAllSportsList")
+	@ResponseBody
+	public JsonData getAllSportsList(String status,HttpServletRequest request) {
+		JsonData data;
+		try {
+			//当前页
+			String cp = request.getParameter("currentpage");
+			int currentPage = 1;
+			if(cp !=  null){
+				currentPage = Integer.valueOf(cp);
+			}
+			Map<String,Object> params = new HashMap<String, Object>();
+			params.put("status", status);
+			int totalCount = sportsMatchService.listAllSportsCount(params);
+			List<Place> list = sportsMatchService.listAllSports(params,currentPage,Conv.pageSize);
+			data = new JsonData("true", new PageBean(currentPage, Conv.pageSize, list, totalCount));
+		} catch (NumberFormatException e) {
+			e.printStackTrace();
+			data = new JsonData("false");
+		}
+		return data;
+	}
+	
+	
 	
 	
 	/**
@@ -52,7 +79,7 @@ public class SportsMatchAciton {
 	 * @param userSportsApply
 	 * @return
 	 */
-	@RequestMapping(value="/publishSports",consumes = "application/json",method=RequestMethod.POST)
+	@RequestMapping(value="/applySports",consumes = "application/json",method=RequestMethod.POST)
 	@ResponseBody
 	public JsonData applySports(@RequestBody UserSportsApply userSportsApply) {
 		JsonData data;

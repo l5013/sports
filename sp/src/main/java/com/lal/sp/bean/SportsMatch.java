@@ -16,8 +16,8 @@ public class SportsMatch {
 	private String province;
 	private String city;
 	private String district;
-	private String longitude;
-	private String latitude;
+	private Double longitude;
+	private Double latitude;
 	private Integer status; //活动状态 1申请中2申请成功3申请失败
 	private String remark;
 	//比赛字段
@@ -108,16 +108,17 @@ public class SportsMatch {
 	public void setDistrict(String district) {
 		this.district = district;
 	}
-	public String getLongitude() {
+	
+	public Double getLongitude() {
 		return longitude;
 	}
-	public void setLongitude(String longitude) {
+	public void setLongitude(Double longitude) {
 		this.longitude = longitude;
 	}
-	public String getLatitude() {
+	public Double getLatitude() {
 		return latitude;
 	}
-	public void setLatitude(String latitude) {
+	public void setLatitude(Double latitude) {
 		this.latitude = latitude;
 	}
 	public Integer getStatus() {

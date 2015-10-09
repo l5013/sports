@@ -39,7 +39,7 @@ public class JudgeCoachService {
 	}
 
 	public List<JudgeCoach> getJudgeCoach(HashMap<String, Object> params, int start, int limit) {
-		return  pageDaoUtil.selectList("com.lal.sp.dao.IJudgeCoach.getJudgeCoach", params, new RowBounds((start-1)*limit,limit));
+		return  pageDaoUtil.selectList("com.lal.sp.dao.IJudgeCoachDao.getJudgeCoach", params, new RowBounds((start-1)*limit,limit));
 	}
 
 	public void evaluate(JCEvaluate jcv) {

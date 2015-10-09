@@ -9,8 +9,8 @@ public class Place {
 	private String openTime;
 	private String closeTime;
 	private String address;
-	private String longitude;
-	private String latitude;
+	private Double longitude;
+	private Double latitude;
 	private String price;
 	private Integer quantity;
 	private Integer status;
@@ -58,16 +58,17 @@ public class Place {
 	public void setAddress(String address) {
 		this.address = address;
 	}
-	public String getLongitude() {
+	
+	public Double getLongitude() {
 		return longitude;
 	}
-	public void setLongitude(String longitude) {
+	public void setLongitude(Double longitude) {
 		this.longitude = longitude;
 	}
-	public String getLatitude() {
+	public Double getLatitude() {
 		return latitude;
 	}
-	public void setLatitude(String latitude) {
+	public void setLatitude(Double latitude) {
 		this.latitude = latitude;
 	}
 	public String getPrice() {
