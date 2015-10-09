@@ -1,0 +1,50 @@
+a.breathing  {
+	display:block;
+    line-height: 20px;
+    width: 50px;        
+    text-align: center;
+    background: #80CB1B;
+    font-size: 12px;
+    padding: 8px 19px 9px;
+    -moz-box-shadow: 0 0 5px #343434;
+    -webkit-box-shadow: 0 0 5px #fff;
+    box-shadow: 0 0 5px #343434;
+    color: #fff;
+    font-weight: bold;
+    padding: 5px 10px;
+    text-decoration: none;
+    text-shadow: 0 -1px 1px rgba(0, 0, 0, 0.25);
+    
+    -moz-animation:breathingLight 2s infinite; /* Firefox */
+    -webkit-animation:breathingLight 2s infinite; /* Safari and Chrome */
+}
+
+@-webkit-keyframes breathingLight {
+        from {
+                background-color: #80CB1B;
+                -webkit-box-shadow:0 0 5px #ccc;
+        }
+		50% {
+                background-color: #B7F20F;
+                -webkit-box-shadow: 0 0 10px #398B08;
+        }
+		to {
+                background-color: #80CB1B;
+                -webkit-box-shadow:0 0 5px #ccc;
+        }
+}
+
+@-moz-keyframes breathingLight {
+        from {
+                background-color: #80CB1B;
+                -moz-box-shadow:0 0 5px #ccc;
+        }
+		50% {	
+                background-color: #B7F20F;
+                -moz-box-shadow: 0 0 10px #398B08;
+        }
+		to {
+                background-color: #80CB1B;
+                -moz-box-shadow:0 0 5px #ccc;
+        }
+}

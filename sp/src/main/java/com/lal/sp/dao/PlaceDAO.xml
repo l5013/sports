@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper 
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lal.sp.dao.IPlaceDao">
+	<!--
+		这里namespace必须是UserMapper接口的路径，不然要运行的时候要报错 “is not known to the
+		MapperRegistry”
+	-->
+	
+	<resultMap type="Place" id="placeMap">
+		<id column="id" property="id"/>
+		<result column="title" property="title"/>
+		<result column="pic" property="pic"/>
+		<result column="content" property="content"/>
+		<result column="openTime" property="openTime"/>
+		<result column="closeTime" property="closeTime"/>
+		<result column="address" property="address"/>
+		<result column="longitude" property="longitude"/>
+		<result column="latitude" property="latitude"/>
+		<result column="price" property="price"/>
+		<result column="quantity" property="quantity"/>
+		<result column="status" property="status"/>
+		<result column="remark" property="remark"/>
+		<association property="sportsCategory" javaType="SportsCategory">
+			<id column="spcId" property="id"/>
+			<result column="spcCode" property="code"/>
+			<result column="spcName" property="name"/>
+			<result column="spcStatus" property="status"/>
+			<result column="spcRemark" property="remark"/>
+		</association>
+	</resultMap>
+	
+	<select id="listPlaces" parameterType="map" resultMap="placeMap">
+		select sp.*,spc.id spcId, spc.sc_code spcCode, spc.sc_name spcName, spc.status spcStatus,spc.remark spcRemark from sp_place sp left join sp_sports_category spc on sp.sportsCategory = spc.id where sp.status=1
+	</select>
+	
+	<select id="listPlacesCount" parameterType="map" resultType="int">
+		select count(*) from sp_place where status = 1
+	</select>
+	
+	<insert id="add" parameterType="Place">
+		insert into sp_place(title,pic,content,openTime,closeTime,address,longitude,latitude,price,sportsCategory,quantity,status,remark) values 
+		(#{title},#{pic},#{content},#{openTime},#{closeTime},#{address},#{longitude},#{latitude},#{price},#{sportsCategory.id},#{quantity},#{status},#{remark})
+	</insert>
+	
+	<select id="findPlaceById" parameterType="string" resultMap="placeMap">
+		select sp.*,spc.id spcId, spc.sc_code spcCode, spc.sc_name spcName, spc.status spcStatus,spc.remark spcRemark from sp_place sp left join sp_sports_category spc on sp.sportsCategory = spc.id where sp.id=#{id}
+	</select>
+	
+	<update id="update" parameterType="Place">
+		update sp_place set title=#{title}
+		<if test="pic!=null">
+			,pic=#{pic}
+		</if>
+		,content=#{content},openTime=#{openTime},closeTime=#{closeTime},address=#{address},longitude=#{longitude},latitude=#{latitude},price=#{price},quantity=#{quantity},status=1,sportsCategory=#{sportsCategory.id} where id=#{id}
+	</update>
+	
+	<update id="delete" parameterType="string">
+		update sp_place set status = 0 where id=#{id}
+	</update>
+</mapper>

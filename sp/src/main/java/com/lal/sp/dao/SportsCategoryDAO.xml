@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper 
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lal.sp.dao.ISportsCategoryDao">
+	<!--
+		这里namespace必须是UserMapper接口的路径，不然要运行的时候要报错 “is not known to the
+		MapperRegistry”
+	-->
+	<resultMap type="SportsCategory" id="sportsCategoryMap">
+		<id column="id" property="id"/>
+		<result column="sc_code" property="code"/>
+		<result column="sc_name" property="name"/>
+		<result column="status" property="status"/>
+		<result column="remark" property="remark"/>
+	</resultMap>
+	
+	<select id="getAllCategory" parameterType="map" resultMap="sportsCategoryMap">
+		select * from sp_sports_category where status = 1
+	</select>
+	
+	<insert id="add" parameterType="SportsCategory">
+		insert into sp_sports_category (sc_code, sc_name, status, remark) values (#{code},#{name},#{status},#{remark})
+	</insert>
+	
+	<update id="delete" parameterType="string">
+		update sp_sports_category set status = 0 where id=#{id}
+	</update>
+</mapper>

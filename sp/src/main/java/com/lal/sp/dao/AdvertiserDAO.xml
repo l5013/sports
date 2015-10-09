@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper 
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lal.sp.dao.IAdvertiserDao">
+	<!--
+		这里namespace必须是UserMapper接口的路径，不然要运行的时候要报错 “is not known to the
+		MapperRegistry”
+	-->
+	
+	<select id="listAdvertisers" parameterType="map" resultType="Advertiser">
+		select * from sp_advertiser
+	</select>
+	
+	<select id="listAdvertisersCount" parameterType="map" resultType="int">
+		select count(*) from sp_advertiser where status = 1
+	</select>
+	
+	<insert id="add" parameterType="Advertiser">
+		insert into sp_advertiser(title,pic,content,status,remark) values 
+		(#{title},#{pic},#{content},#{status},#{remark})
+	</insert>
+	
+	<select id="findAdvertiserById" parameterType="string" resultType="Advertiser">
+		select * from sp_advertiser where id=#{id}
+	</select>
+	
+	<update id="update" parameterType="Advertiser">
+		update sp_advertiser set title=#{title}
+		<if test="pic!=null">
+		,pic=#{pic}
+		</if>
+		,content=#{content} where id=#{id}
+	</update>
+	
+	<update id="delete" parameterType="string">
+		update sp_advertiser set status = 0 where id=#{id}
+	</update>
+</mapper>

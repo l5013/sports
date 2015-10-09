@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="
+     http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+     http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+     http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-3.0.xsd
+     http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+     http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+     http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.1.xsd">
+     
+    <!-- Spring组件自动扫描 -->
+    <context:component-scan base-package="com.lal.sp"/>
+    <!-- 启用Spring注解 -->
+    <context:annotation-config />
+     
+    <context:property-placeholder location="classpath:com/lal/sp/config/db.properties" />  
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close"> 
+        <property name="url" value="${jdbcUrl}" />
+        <property name="username" value="${user}" />
+        <property name="password" value="${password}" />
+        <property name="filters" value="stat" />
+        <property name="maxActive" value="${maxPoolSize}" />
+        <property name="initialSize" value="${minPoolSize}" />
+        <property name="maxWait" value="60000" />
+        <property name="minIdle" value="${minPoolSize}" />
+        <property name="timeBetweenEvictionRunsMillis" value="3000" />
+        <property name="minEvictableIdleTimeMillis" value="300000" />
+        <property name="validationQuery" value="SELECT 'x'" />
+        <property name="testWhileIdle" value="true" />
+        <property name="testOnBorrow" value="false" />
+        <property name="testOnReturn" value="false" />
+        <property name="poolPreparedStatements" value="false" />
+        <!-- PSCache 仅供 Oracle/DB2/SQL Server 支持游标的数据库配置 -->
+        <!-- <property name="maxPoolPreparedStatementPerConnectionSize" value="20" /> -->
+    </bean>
+	  
+    <!-- transaction manager, use JtaTransactionManager for global tx -->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+	  
+    <!-- define the SqlSessionFactory -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+        <property name="mapperLocations" value="classpath*:com/lal/sp/dao/*.xml" /> 
+        <property name="typeAliasesPackage" value="com.lal.sp.bean" />
+        <property name="configLocation" value="classpath:com/lal/sp/config/mybatis-config.xml" />
+    </bean>
+
+    <!-- scan for mappers and let them be autowired -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.lal.sp.dao" />
+    </bean>
+    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource" ref="dataSource" />
+	</bean>                    
+	
+     <mvc:annotation-driven/>
+    
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">  
+        <!-- viewClass属性可以用来指定前台在解析数据时，所允许采用的手段。实际上其默认值就是JstlView -->  
+        <!-- 将来有需要的话，就可以在这里把JstlView改成其它的，如FreeMarkerView,VelocityView,TilesView -->  
+        <!-- <property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/> -->  
+        <!-- 若Controller的方法返回"user/addSuccess",则SpringMVC自动找/WEB-INF/jsp/user/addSuccess.jsp -->  
+        <property name="prefix" value="/jsp/"/>  
+        <property name="suffix" value=".jsp"/>
+    </bean>  
+    
+    <!-- 配置文件上传解析器 -->
+    <bean id="multipartResolver"
+          class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <!-- 设置上传文件的最大尺寸为100MB -->
+        <property name="maxUploadSize">
+            <value>104857600</value>
+        </property>
+    </bean>
+    
+    <bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg index="0" ref="sqlSessionFactory" />
+	</bean>
+	
+	<tx:annotation-driven transaction-manager="transactionManager"/>
+	
+</beans>

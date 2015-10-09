@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper 
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lal.sp.dao.IJudgeCoachDao">
+	<!--
+		这里namespace必须是UserMapper接口的路径，不然要运行的时候要报错 “is not known to the
+		MapperRegistry”
+	-->
+	
+	<resultMap type="JudgeCoach" id="judgeCoachMap">
+		<id property="id" column="id"/>
+		<result property="name" column="jc_name"/>
+		<result property="age" column="jc_age"/>
+		<result property="gender" column="jc_gender"/>
+		<result property="phone" column="jc_phone"/>
+		<result column="jc_evaluate" property="evaluate"/>
+		<result column="jc_jifen" property="jifen"/>
+		<result column="type" property="type"/>
+		<result column="status" property="status"/>
+		<result column="resume" property="resume"/>
+		<result property="province" column="province"/>
+		<result property="city" column="city"/>
+		<result property="district" column="district"/>
+		<collection property="sportsCategory" ofType="SportsCategory" >
+			<id column="spcId" property="id"/>
+			<result column="spcCode" property="code"/>
+			<result column="spcName" property="name"/>
+			<result column="spcStatus" property="status"/>
+			<result column="spcRemark" property="remark"/>
+		</collection>
+	</resultMap>
+	
+	<insert id="add" parameterType="JudgeCoach" useGeneratedKeys="true" keyProperty="id">
+		insert into sp_judges_coachs (jc_name,jc_gender,jc_age,jc_phone,jc_evaluate,jc_jifen,type,province,city,district,status,resume,sp_user_id)
+		values (#{name},#{gender},#{age},#{phone},#{evaluate},#{jifen},#{type},#{province},#{city},#{district},#{status},#{resume},#{user.id})
+	</insert>
+	
+	<insert id="addJCSportsCategory" parameterType="JudgeCoach">
+		insert into sp_judges_coachs_sports_category (sp_judges_coachs_id,sp_sports_category_id) values
+		<foreach collection="sportsCategory" item="obj" index="index" separator="," >
+			(#{id},#{obj.id})
+		</foreach>
+	</insert>
+	
+	<select id="getJudgeCoach" parameterType="map" resultMap="judgeCoachMap">
+		select jcsc.*,spc.id spcId, spc.sc_code spcCode, spc.sc_name spcName, spc.status spcStatus,spc.remark spcRemark from (select sjc.*,sjcsc.sp_sports_category_id as sjcscId from sp_judges_coachs sjc left join sp_judges_coachs_sports_category sjcsc on sjc.id=sjcsc.sp_judges_coachs_id) jcsc left join sp_sports_category spc on jcsc.sjcscId=spc.id where 1=1
+		<if test="sportsCategoryId!=null">
+			and spc.id=#{sportsCategoryId}
+		</if>
+	</select>
+	
+	<select id="getJudgeCoachCount" parameterType="map" resultType="int">
+		select count(*) from (select sjc.*,sjcsc.sp_sports_category_id as sjcscId from sp_judges_coachs sjc left join sp_judges_coachs_sports_category sjcsc on sjc.id=sjcsc.sp_judges_coachs_id) jcsc left join sp_sports_category spc on jcsc.sjcscId=spc.id where 1=1
+		<if test="sportsCategoryId!=null">
+			and spc.id=#{sportsCategoryId}
+		</if>
+	</select>
+	
+	<insert id="addEvaluate" parameterType="JCEvaluate">
+		insert into sp_judges_coachs_evaluate (sp_judges_coachs_id,sp_user_id,evaluate,evaluate_content,jifen) values(#{judgeCoach.id},#{user.id},#{evaluate},#{evaluateContent},#{jifen})
+	</insert>
+	
+	
+</mapper>

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper 
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lal.sp.dao.IUserDao">
+	<!--
+		这里namespace必须是UserMapper接口的路径，不然要运行的时候要报错 “is not known to the
+		MapperRegistry”
+	-->
+	
+	<resultMap type="User" id="userMap">
+		<id property="id" column="id"/>
+		<result property="name" column="us_name"/>
+		<result property="nickname" column="us_nickname"/>
+		<result property="picture" column="us_picture"/>
+		<result property="phone" column="us_phone"/>
+		<result property="password" column="us_password"/>
+		<result property="age" column="us_age"/>
+		<result property="gender" column="us_gender"/>
+		<result property="email" column="us_email"/>
+		<result property="qq" column="us_qq"/>
+		<result property="weixin" column="us_weixin"/>
+		<result property="interest" column="us_interest"/>
+		<result property="introduction" column="us_introduction"/>
+		<result property="province" column="province"/>
+		<result property="city" column="city"/>
+		<result property="district" column="district"/>
+		<result property="job" column="us_job"/>
+		<result property="jifen" column="us_jifen"/>
+		<result property="status" column="status"/>
+		<result property="remark" column="remark"/>
+		<association property="judgeCoach" javaType="JudgeCoach">
+			<id column="jcId" property="id"/>
+			<result column="evaluate" property="evaluate"/>
+			<result column="jifen" property="jifen"/>
+			<result column="type" property="type"/>
+			<result column="jcStatus" property="status"/>
+			<result column="jcResume" property="resume"/>
+		</association>
+		<collection property="sportsCategory" ofType="SportsCategory" >
+			<id column="spcId" property="id"/>
+			<result column="spcCode" property="code"/>
+			<result column="spcName" property="name"/>
+			<result column="spcStatus" property="status"/>
+			<result column="spcRemark" property="remark"/>
+		</collection>
+	</resultMap>
+	
+	<insert id="add" parameterType="User" useGeneratedKeys="true" keyProperty="id">
+		insert into sp_user (us_name,us_nickname,us_picture,us_phone,us_password,us_age,us_gender,us_email,us_qq,us_weixin,us_interest,
+		us_introduction,province,city,district,us_job,us_jifen,status,remark)
+		values (#{name},#{nickname},#{picture},#{phone},#{password},#{age},#{gender},#{email},#{qq},#{weixin},#{interest},#{introduction},#{province},#{city},#{district},#{job},#{jifen},#{status},#{remark})
+	</insert>
+	
+	<insert id="addUserSportsCategory" parameterType="User">
+		insert into sp_user_sports_category (sp_user_id,sp_sports_category_id) values
+		<foreach collection="sportsCategory" item="obj" index="index" separator="," >
+			(#{id},#{obj.id})
+		</foreach>
+	</insert>
+	
+	<update id="updatePwd" parameterType="map">
+		update sp_user set password=#{password} where id = #{id}
+	</update>
+	
+	<select id="login" parameterType="map" resultMap="userMap">
+		select suc.*,spc.id spcId, spc.sc_code spcCode, spc.sc_name spcName, spc.status spcStatus,spc.remark spcRemark from (select sujc.*,susc.sp_sports_category_id as suscId from (select su.*,jc.jc_evaluate as evaluate,jc.jc_jifen as jifen,jc.type,jc.status as jcStatus,jc.resume as jcResume from sp_user su left join sp_judges_coachs jc on su.jcid=jc.id) sujc 
+		left join sp_user_sports_category susc on sujc.id=susc.sp_user_id) suc left join sp_sports_category spc on suc.suscId=spc.id
+		where suc.us_phone=#{username} and suc.us_password=#{password}
+	</select>
+	
+	<select id="getUserById" parameterType="string" resultMap="userMap">
+		select suc.*,spc.id spcId, spc.sc_code spcCode, spc.sc_name spcName, spc.status spcStatus,spc.remark spcRemark from (select sujc.*,susc.sp_sports_category_id as suscId from (select su.*,jc.jc_evaluate as evaluate,jc.jc_jifen as jifen,jc.type,jc.status as jcStatus,jc.resume as jcResume from sp_user su left join sp_judges_coachs jc on su.jcid=jc.id) sujc 
+		left join sp_user_sports_category susc on sujc.id=susc.sp_user_id) suc left join sp_sports_category spc on suc.suscId=spc.id
+		where suc.id=#{id}
+	</select>
+	
+	<update id="updateJudgeCoach" parameterType="string">
+		update sp_user set jcid=#{jcid} where id=#{uid}
+	</update>
+	
+	<insert id="publishSports" parameterType="SportsMatch">
+		insert into sp_sports_match(sm_name,sm_picture,sm_content,sm_start_time,sm_end_time,sm_join_end_time,sm_persons,sm_cost,sp_address,sp_publisher,province,city,district,longitude,latitude,status,remark)
+		values(#{name},#{picture},#{content},#{content},#{startTime},#{endTime},#{joinEndTime},#{persons},#{cost},#{address},#{publisher.id},#{province},#{city},#{district},#{longitude},#{latitude},#{status},#{remark})
+	</insert>
+	
+	<insert id="applySports" parameterType="UserSportsApply">
+		insert into sp_sprots_users (sp_sports_id,sp_user_id,user_phone,user_name,status,remark) values(#{sportsMatch.id},#{user.id},#{phone},#{name},#{status},#{remark})
+	</insert>
+</mapper>
