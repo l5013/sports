@@ -5,20 +5,18 @@ import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import javax.ws.rs.PathParam;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.lal.sp.bean.Place;
+import com.lal.sp.bean.JsonData;
 import com.lal.sp.bean.SportsCategory;
 import com.lal.sp.service.SportsCategoryService;
-import com.lal.sp.util.FilesUtil;
 
 
 @Controller
@@ -49,5 +47,19 @@ public class SportsCategoryAction {
 	public String delete(HttpServletRequest request,@PathVariable String id) {
 		sportsCategoryService.delete(id);
 		return "redirect:/SportsCategory/list.do";
+	}
+	
+	@RequestMapping("/getAllSportsCategory")
+	@ResponseBody
+	public JsonData getAllSportsCategory() {
+		JsonData data;
+		try {
+			List<SportsCategory> list = sportsCategoryService.getAllCategory();
+			data = new JsonData("true",list);
+		} catch (Exception e) {
+			e.printStackTrace();
+			data = new JsonData("false");
+		}
+		return data;
 	}
 }

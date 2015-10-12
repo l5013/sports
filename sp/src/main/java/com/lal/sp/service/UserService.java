@@ -41,12 +41,8 @@ public class UserService {
 		return userDao.getUserById(id);
 	}
 
-	public void publishSports(SportsMatch sportsMatch) {
-		userDao.publishSports(sportsMatch);
-	}
-
-	public void applySports(UserSportsApply userSportsApply) {
-		userDao.applySports(userSportsApply);
+	public void addJifen(User user) {
+		userDao.addJifen(user);
 	}
 
 }

@@ -42,8 +42,12 @@ public class JudgeCoachService {
 		return  pageDaoUtil.selectList("com.lal.sp.dao.IJudgeCoachDao.getJudgeCoach", params, new RowBounds((start-1)*limit,limit));
 	}
 
+	@Transactional
 	public void evaluate(JCEvaluate jcv) {
 		judgeCoachDao.addEvaluate(jcv);
+		JudgeCoach judgeCoach = judgeCoachDao.getJudgeCoachById(jcv.getJudgeCoach().getId().toString());
+		judgeCoach.setJifen(judgeCoach.getJifen()+jcv.getJifen());
+		judgeCoachDao.addJifen(judgeCoach);
 	}
 	
 

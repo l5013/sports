@@ -18,4 +18,8 @@ public interface IJudgeCoachDao {
 
 	void addEvaluate(JCEvaluate jcv);
 
+	JudgeCoach getJudgeCoachById(String id);
+
+	void addJifen(JudgeCoach judgeCoach);
+
 }

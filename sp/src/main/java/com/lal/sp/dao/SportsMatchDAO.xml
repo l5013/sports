@@ -59,11 +59,40 @@
 			<result property="phone" column="oPhone"/>
 		</association>
 		<association property="site" javaType="Place">
-			<id/>
+			<id property="id" column="sm_site"/>
 		</association>
 		<association property="insurance" javaType="Insurance">
-			<id/>
+			<id property="id" column="sm_insurance"/>
 		</association>
+		<collection property="judgeCoachs" ofType="JudgeCoach">
+			<id property="id" column="judgeId"/>
+			<result property="name" column="jcName"/>
+			<result property="age" column="jcAge"/>
+			<result property="gender" column="jcGender"/>
+			<result property="phone" column="jcPhone"/>
+			<result property="type" column="jcType"/>
+		</collection>
+	</resultMap>
+	
+	<resultMap type="UserSportsApply" id="userSportsApplyMap">
+		<result property="phone" column="user_phone"/>
+		<result property="name" column="user_name"/>
+		<result property="status" column="usapplyStatus"/>
+		<result property="remark" column="usapplyRemark"/>
+		<association property="user" javaType="User">
+			<id property="id" column="sp_user_id"/>
+		</association>
+		<association property="sportsMatch" resultMap="sportsMap"/>
+	</resultMap>
+	
+	<resultMap type="UserSportsMatchApply" id="userSportsMatchApplyMap">
+		<id property="id" column="spmuId"/>
+		<result property="status" column="usapplyStatus"/>
+		<result property="remark" column="usapplyRemark"/>
+		<association property="user" javaType="User">
+			<id property="id" column="sp_user_id"/>
+		</association>
+		<collection property="sportsMatch" resultMap="sportsMatchMap"/>
 	</resultMap>
 	
 	<insert id="publishSports" parameterType="SportsMatch">
@@ -76,13 +105,135 @@
 	</insert>
 	
 	<select id="listAllSportsCount" parameterType="map">
-		select count(*) from sp_sports where status=#{status}
+		select count(*) from sp_sports where 1=1
+		<if test="status!=null">
+			status=#{status}
+		</if>
 	</select>
 	
 	<select id="listAllSports" resultMap="sportsMap" parameterType="map">
 		select sp.*,su.id as userId,su.us_name as userName,su.us_phone as userPhone from sp_sports sp left join sp_user su on sp.sp_publisher=su.id where 1=1
 		<if test="status!=null">
-			and status=#{status}
+			and sp.status=#{status}
 		</if>
 	</select>
+	
+	<select id="listNearBySports" resultMap="sportsMap" parameterType="map">
+		select sp.*,su.id as userId,su.us_name as userName,su.us_phone as userPhone from sp_sports sp left join sp_user su on sp.sp_publisher=su.id where sp.status=2 and now()&lt;sp.sp_end_time
+		<if test="squares!=null">
+			and sp.latitude&lt;&gt;0 and sp.latitude&gt;#{squares.rightBottomPoint[0]} and sp.latitude&lt;#{squares.leftTopPoint[0]} and sp.longitude&gt;#{squares.leftTopPoint[1]} and sp.longitude&lt;#{squares.rightBottomPoint[1]}
+		</if>
+	</select>
+	
+	<select id="listNearBySportsCount" resultType="int" parameterType="map">
+		select count(*) from sp_sports sp left join sp_user su on sp.sp_publisher=su.id where sp.status=2 and now()&lt;sp.sp_end_time
+		<if test="squares!=null">
+			and sp.latitude&lt;&gt;0 and sp.latitude&gt;#{squares.rightBottomPoint[0]} and sp.latitude&lt;#{squares.leftTopPoint[0]} and sp.longitude&gt;#{squares.leftTopPoint[1]} and sp.longitude&lt;#{squares.rightBottomPoint[1]}
+		</if>
+	</select>
+	
+	<select id="getApplySportsList" resultMap="userSportsApplyMap" parameterType="map">
+		select sp.*,spu.user_phone,spu.user_name,spu.status as usapplyStatus,spu.remark as usapplyRemark,spu.sp_user_id from sp_sprots_users spu left join sp_sports sp on spu.sp_sports_id=sp.id where sp_sports_id=#{sportsId}
+		<if test="user!=null">
+			and sp_user_id is not null
+		</if>
+		<if test="people!=null">
+			and sp_user_id is null
+		</if>
+	</select>
+	
+	<update id="auditingApplySports" parameterType="map">
+		update sp_sprots_users set status = 1 where (sp_sports_id=#{sportsId} and sp_user_id=#{user}) or (sp_sports_id=#{sportsId} and user_phone=#{user})
+	</update>
+	
+	<select id="getMyPushlishSports" parameterType="string" resultMap="sportsMap">
+		select * from sp_sports where sp_publisher=#{userId}
+	</select>
+	
+	<select id="getMyApplySports" parameterType="string" resultMap="userSportsApplyMap">
+		select sp.*,spu.user_phone,spu.user_name,spu.status as usapplyStatus,spu.remark as usapplyRemark,spu.sp_user_id from sp_sprots_users spu left join sp_sports sp on spu.sp_sports_id=sp.id where sp_user_id=#{user} or user_phone=#{user}
+	</select>
+	
+	<select id="listAllSportsMatchCount" parameterType="map">
+		select count(*) from sp_sports_match where 1=1
+		<if test="status!=null">
+			and status=#{status}
+		</if>
+		<if test="type!=null">
+			and sm_type=#{type}
+		</if>
+	</select>
+	
+	<select id="listAllSportsMatch" resultMap="sportsMatchMap" parameterType="map">
+		select spm.*,so.id as od,so.org_name as oName,so.org_phone as userPhone from sp_sports_match spm left join sp_organization so on spm.sp_publisher=so.id where 1=1
+		<if test="status!=null">
+			and spm.status=#{status}
+		</if>
+		<if test="type!=null">
+			and sm_type=#{type}
+		</if>
+	</select>
+	
+	<select id="listNearBySportsMatch" resultMap="sportsMatchMap" parameterType="map">
+		select spm.*,so.id as oId,so.org_name as oName,so.org_phone as userPhone from sp_sports_match spm left join sp_organization so on spm.sp_publisher=so.id where sp.status=2 and now()&lt;spm.sm_end_time
+		<if test="squares!=null">
+			and spm.latitude&lt;&gt;0 and spm.latitude&gt;#{squares.rightBottomPoint[0]} and spm.latitude&lt;#{squares.leftTopPoint[0]} and spm.longitude&gt;#{squares.leftTopPoint[1]} and spm.longitude&lt;#{squares.rightBottomPoint[1]}
+		</if>
+		<if test="type!=null">
+			spm.sm_type=#{type}
+		</if>
+	</select>
+	
+	<select id="listNearBySportsMatchCount" resultType="int" parameterType="map">
+		select count(*) from sp_sports_match spm left join sp_organization so on spm.sp_publisher=so.id where spm.status=2 and now()&lt;spm.sm_end_time
+		<if test="squares!=null">
+			and spm.latitude&lt;&gt;0 and spm.latitude&gt;#{squares.rightBottomPoint[0]} and spm.latitude&lt;#{squares.leftTopPoint[0]} and spm.longitude&gt;#{squares.leftTopPoint[1]} and spm.longitude&lt;#{squares.rightBottomPoint[1]}
+		</if>
+		<if test="type!=null">
+			spm.sm_type=#{type}
+		</if>
+	</select>
+	
+	<insert id="addSportsMatch" parameterType="SportsMatch">
+		insert into sp_sports(sm_name,sm_picture,sm_content,sm_start_time,sm_end_time,sm_join_end_time,sm_persons,sm_cost,sm_site,sm_insurance,sm_address,sm_publisher,sm_type,province,city,district,longitude,latitude,status,remark)
+		values(#{name},#{picture},#{content},#{content},#{startTime},#{endTime},#{joinEndTime},#{persons},#{cost},#{site.id},#{insurance.id},#{address},#{publisher.id},#{type},#{province},#{city},#{district},#{longitude},#{latitude},#{status},#{remark})
+	</insert>
+	
+	<insert id="addSMJudgeCoachs" parameterType="SportsMatch">
+		insert into sp_sprots_judges (sp_sports_match_id,sp_judge_id) values
+		<foreach collection="judgeCoachs" item="obj" index="index" separator="," >
+			(#{id},#{obj.id})
+		</foreach>
+	</insert>
+	
+	<insert id="applySportsMatch" parameterType="UserSportsMatchApply">
+		insert into sp_sprots_match_users (sp_sports_match_id,sp_user_id,status,remark) values(#{sportsMatch.id},#{user.id},#{status},#{remark})
+	</insert>
+	
+	
+	<select id="getApplySportsMatchList" resultMap="userSportsMatchApplyMap" parameterType="string">
+		select spm.*,spmu.status as usapplyStatus,spmu.remark as usapplyRemark,spmu.sp_user_id from sp_sprots_match_users spmu left join sp_sports_match spm on spmu.sp_sports_match_id=spm.id where sp_sports_match_id=#{sportsMatchId}
+	</select>
+	
+	<update id="auditingApplySportsMatch" parameterType="map">
+		update sp_sprots_match_users set status = 1 where sp_sports_match_id=#{sportsMatchId} and sp_user_id=#{userId}
+	</update>
+	
+	<select id="getAllPushlishSportsMatch" parameterType="string" resultMap="sportsMatchMap">
+		select * from sp_sports_match where sp_publisher=#{oId}
+	</select>
+	
+	<select id="getMyApplySportsMatch" parameterType="string" resultMap="userSportsMatchApplyMap">
+		select smj.*,sjc.jc_name as jcName,sjc.jc_phone as jcPhone,sjc.jc_gender as jcGender,sjc.jc_age as jcAge,sjc.type as jcType from (select sm.*,spj.sp_judge_id as judgeId from (select spmu.id as spmuId,spmu.status as usapplyStatus,spmu.remark as usapplyRemark,spmu.sp_user_id,spm.* from sp_sprots_match_users spmu left join sp_sports_match spm on spmu.sp_sports_match_id=spm.id) sm left join sp_sprots_judges spj on sm.id=spj.sp_sports_match_id)
+		smj left join sp_judges_coachs sjc on smj.judgeId=sjc.id where smj.sp_user_id=#{userId}
+	</select>
+	
+	<insert id="addSportsEvaluate" parameterType="SportsMatchEvaluate">
+		insert into sp_sprots_evaluate (sp_sports_id,sp_user_id,evaluate,evaluate_content,jifen) values(#{sportsMatch.id},#{user.id},#{evaluate},#{evaluateContent},#{jifen})
+	</insert>
+	
+	<insert id="addSportsMatchEvaluate" parameterType="SportsMatchEvaluate">
+		insert into sm_sprots_evaluate (sm_sports_id,sp_user_id,evaluate,evaluate_content,jifen) values(#{sportsMatch.id},#{user.id},#{evaluate},#{evaluateContent},#{jifen})
+	</insert>
+	
 </mapper>

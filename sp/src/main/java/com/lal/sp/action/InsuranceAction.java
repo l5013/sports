@@ -13,18 +13,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.lal.sp.bean.Advertiser;
 import com.lal.sp.bean.Insurance;
+import com.lal.sp.bean.JsonData;
 import com.lal.sp.bean.PageBean;
-import com.lal.sp.bean.Place;
-import com.lal.sp.bean.SportsCategory;
-import com.lal.sp.service.AdvertiserService;
 import com.lal.sp.service.InsuranceService;
-import com.lal.sp.service.PlaceService;
-import com.lal.sp.service.SportsCategoryService;
 import com.lal.sp.util.Conv;
 import com.lal.sp.util.FilesUtil;
 
@@ -101,6 +97,32 @@ public class InsuranceAction {
 	public String delete(HttpServletRequest request,@PathVariable String id) {
 		insuranceService.delete(id);
 		return "redirect:/Insurance/list.do";
+	}
+	
+	
+	@RequestMapping("/getAllInsuranceList")
+	@ResponseBody
+	public JsonData getAllInsuranceList(HttpServletRequest request,String searchInfo) {
+		JsonData data;
+		try {
+			//当前页
+			String cp = request.getParameter("currentpage");
+			int currentPage = 1;
+			if(cp !=  null){
+				currentPage = Integer.valueOf(cp);
+			}
+			Map<String,Object> params = new HashMap<String, Object>();
+			if(searchInfo!=null && !"".equals(searchInfo)) {
+				params.put("searchInfo", searchInfo);
+			}
+			int totalCount = insuranceService.listInsurancesCount(params);
+			List<Insurance> list = insuranceService.listInsurances(params,currentPage,Conv.pageSize);
+			data = new JsonData("true",new PageBean(currentPage, Conv.pageSize, list, totalCount));
+		} catch (Exception e) {
+			e.printStackTrace();
+			data = new JsonData("false");
+		}
+		return data;
 	}
 	
 }

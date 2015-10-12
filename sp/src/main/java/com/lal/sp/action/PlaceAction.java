@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.lal.sp.bean.JsonData;
 import com.lal.sp.bean.PageBean;
 import com.lal.sp.bean.Place;
 import com.lal.sp.bean.SportsCategory;
@@ -35,7 +36,7 @@ public class PlaceAction {
 	private SportsCategoryService sportsCategoryService;
 	
 	@RequestMapping("/list")
-	public ModelAndView list(HttpServletRequest request,String searchInfo,HttpSession session) {
+	public ModelAndView list(HttpServletRequest request,String searchInfo,String categoryId, HttpSession session) {
 		//当前页
 		String cp = request.getParameter("currentpage");
 		int currentPage = 1;
@@ -45,6 +46,9 @@ public class PlaceAction {
 		Map<String,Object> params = new HashMap<String, Object>();
 		if(searchInfo!=null && !"".equals(searchInfo)) {
 			params.put("searchInfo", searchInfo);
+		}
+		if(categoryId!=null && !"".equals(categoryId)) {
+			params.put("categoryId", categoryId);
 		}
 		int totalCount = placeService.listPlacesCount(params);
 		List<Place> recordList = placeService.listPlaces(params,currentPage,Conv.pageSize);
@@ -103,6 +107,30 @@ public class PlaceAction {
 	public String delete(HttpServletRequest request,@PathVariable String id) {
 		placeService.delete(id);
 		return "redirect:/User/list.do";
+	}
+	
+	@RequestMapping("/getPlaceList")
+	public JsonData getPlaceList(String categoryId,HttpServletRequest request) {
+		JsonData data;
+		try {
+			//当前页
+			String cp = request.getParameter("currentpage");
+			int currentPage = 1;
+			if(cp !=  null){
+				currentPage = Integer.valueOf(cp);
+			}
+			Map<String,Object> params = new HashMap<String, Object>();
+			if(categoryId!=null && !"".equals(categoryId)) {
+				params.put("categoryId", categoryId);
+			}
+			int totalCount = placeService.listPlacesCount(params);
+			List<Place> list = placeService.listPlaces(params,currentPage,Conv.pageSize);
+			data = new JsonData("true",new PageBean(currentPage, Conv.pageSize, list, totalCount));
+		} catch (Exception e) {
+			e.printStackTrace();
+			data = new JsonData("false");
+		}
+		return data;
 	}
 	
 }

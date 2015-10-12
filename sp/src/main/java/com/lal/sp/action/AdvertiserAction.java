@@ -19,10 +19,7 @@ import org.springframework.web.servlet.ModelAndView;
 import com.lal.sp.bean.Advertiser;
 import com.lal.sp.bean.PageBean;
 import com.lal.sp.bean.Place;
-import com.lal.sp.bean.SportsCategory;
 import com.lal.sp.service.AdvertiserService;
-import com.lal.sp.service.PlaceService;
-import com.lal.sp.service.SportsCategoryService;
 import com.lal.sp.util.Conv;
 import com.lal.sp.util.FilesUtil;
 

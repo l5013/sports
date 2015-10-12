@@ -1,8 +1,6 @@
 package com.lal.sp.action;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,9 +12,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.lal.sp.bean.JsonData;
-import com.lal.sp.bean.SportsMatch;
 import com.lal.sp.bean.User;
-import com.lal.sp.bean.UserSportsApply;
 import com.lal.sp.service.UserService;
 import com.lal.sp.util.MyMD5Util;
 
@@ -26,15 +22,6 @@ public class UserAciton {
 	
 	@Autowired
 	private UserService userService;
-	
-	@RequestMapping("/getAllUser")
-	@ResponseBody
-	public JsonData getAllUser() {
-		
-		List<User> list = new ArrayList<User>();
-		JsonData data = null;
-		return data;
-	}
 	
 	@RequestMapping(value="/register",consumes = "application/json",method=RequestMethod.POST)
 	@ResponseBody
@@ -51,9 +38,9 @@ public class UserAciton {
 		return data;
 	}
 	
-	@RequestMapping(value="/updatePwd/{id}")
+	@RequestMapping(value="/updatePwd")
 	@ResponseBody
-	public JsonData updatePwd(@PathVariable String id, String newPwd) {
+	public JsonData updatePwd(String id, String newPwd) {
 		Map<String, Object> param = new HashMap<String, Object>();
 		param.put("id", id);
 		param.put("password", MyMD5Util.getMD5(newPwd.getBytes()));

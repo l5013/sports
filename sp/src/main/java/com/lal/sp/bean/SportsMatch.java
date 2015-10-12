@@ -1,5 +1,7 @@
 package com.lal.sp.bean;
 
+import java.util.List;
+
 public class SportsMatch {
 	
 	private Integer id;
@@ -24,6 +26,7 @@ public class SportsMatch {
 	private Place site;
 	private Insurance insurance;
 	private Integer type; //类型 1比赛2活动
+	private List<JudgeCoach> judgeCoachs;
 	public Integer getId() {
 		return id;
 	}
@@ -151,6 +154,11 @@ public class SportsMatch {
 	public void setType(Integer type) {
 		this.type = type;
 	}
-	
+	public List<JudgeCoach> getJudgeCoachs() {
+		return judgeCoachs;
+	}
+	public void setJudgeCoachs(List<JudgeCoach> judgeCoachs) {
+		this.judgeCoachs = judgeCoachs;
+	}
 	
 }

@@ -61,5 +61,13 @@
 		insert into sp_judges_coachs_evaluate (sp_judges_coachs_id,sp_user_id,evaluate,evaluate_content,jifen) values(#{judgeCoach.id},#{user.id},#{evaluate},#{evaluateContent},#{jifen})
 	</insert>
 	
+	<select id="getJudgeCoachById" parameterType="string" resultMap="judgeCoachMap">
+		select jcsc.*,spc.id spcId, spc.sc_code spcCode, spc.sc_name spcName, spc.status spcStatus,spc.remark spcRemark from (select sjc.*,sjcsc.sp_sports_category_id as sjcscId from sp_judges_coachs sjc left join sp_judges_coachs_sports_category sjcsc on sjc.id=sjcsc.sp_judges_coachs_id) jcsc left join sp_sports_category spc on jcsc.sjcscId=spc.id where jcsc.id=#{id}
+	</select>
+	
+	<update id="addJifen" parameterType="JudgeCoach">
+		update sp_judges_coachs set jc_jifen=#{jifen} where id=#{id}
+	</update>
+	
 	
 </mapper>

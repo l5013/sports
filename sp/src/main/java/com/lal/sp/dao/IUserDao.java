@@ -3,9 +3,7 @@ package com.lal.sp.dao;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.lal.sp.bean.SportsMatch;
 import com.lal.sp.bean.User;
-import com.lal.sp.bean.UserSportsApply;
 
 public interface IUserDao {
 
@@ -21,8 +19,6 @@ public interface IUserDao {
 
 	void updateJudgeCoach(HashMap<String, Object> param);
 
-	void publishSports(SportsMatch sportsMatch);
-
-	void applySports(UserSportsApply userSportsApply);
+	void addJifen(User user);
 
 }

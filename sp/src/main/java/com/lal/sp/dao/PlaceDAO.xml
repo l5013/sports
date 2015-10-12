@@ -33,10 +33,22 @@
 	
 	<select id="listPlaces" parameterType="map" resultMap="placeMap">
 		select sp.*,spc.id spcId, spc.sc_code spcCode, spc.sc_name spcName, spc.status spcStatus,spc.remark spcRemark from sp_place sp left join sp_sports_category spc on sp.sportsCategory = spc.id where sp.status=1
+		<if test="searchInfo!=null">
+			and sp.address like "%"#{searchInfo}"%"
+		</if>
+		<if test="categoryId!=null">
+			and sp.sportsCategory=#{categoryId}
+		</if>
 	</select>
 	
 	<select id="listPlacesCount" parameterType="map" resultType="int">
 		select count(*) from sp_place where status = 1
+		<if test="searchInfo!=null">
+			and sp.address like "%"#{searchInfo}"%"
+		</if>
+		<if test="categoryId!=null">
+			and sp.sportsCategory=#{categoryId}
+		</if>
 	</select>
 	
 	<insert id="add" parameterType="Place">

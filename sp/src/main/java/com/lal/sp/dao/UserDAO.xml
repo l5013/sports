@@ -60,7 +60,7 @@
 	</insert>
 	
 	<update id="updatePwd" parameterType="map">
-		update sp_user set password=#{password} where id = #{id}
+		update sp_user set us_password=#{password} where id = #{id}
 	</update>
 	
 	<select id="login" parameterType="map" resultMap="userMap">
@@ -79,12 +79,7 @@
 		update sp_user set jcid=#{jcid} where id=#{uid}
 	</update>
 	
-	<insert id="publishSports" parameterType="SportsMatch">
-		insert into sp_sports_match(sm_name,sm_picture,sm_content,sm_start_time,sm_end_time,sm_join_end_time,sm_persons,sm_cost,sp_address,sp_publisher,province,city,district,longitude,latitude,status,remark)
-		values(#{name},#{picture},#{content},#{content},#{startTime},#{endTime},#{joinEndTime},#{persons},#{cost},#{address},#{publisher.id},#{province},#{city},#{district},#{longitude},#{latitude},#{status},#{remark})
-	</insert>
-	
-	<insert id="applySports" parameterType="UserSportsApply">
-		insert into sp_sprots_users (sp_sports_id,sp_user_id,user_phone,user_name,status,remark) values(#{sportsMatch.id},#{user.id},#{phone},#{name},#{status},#{remark})
-	</insert>
+	<update id="addJifen" parameterType="User">
+		update sp_user set us_jifen = #{jifen} where id=#{id}
+	</update>
 </mapper>
