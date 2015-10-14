@@ -62,7 +62,7 @@ public class OrganizationAction {
 	public JsonData login(String username, String password) {
 		Map<String, Object> param = new HashMap<String, Object>();
 		param.put("username", username);
-		param.put("password", password);
+		param.put("password", MyMD5Util.getMD5(password.getBytes()));
 		JsonData data;
 		try {
 			User user = organizationService.login(param);
